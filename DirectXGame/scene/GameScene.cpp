@@ -2,6 +2,7 @@
 #include <cassert>
 #include <sstream>
 #include <iomanip>
+#include "FbxLoader.h"
 
 using namespace DirectX;
 
@@ -15,7 +16,7 @@ GameScene::~GameScene()
 	safe_delete(lightGroup);
 }
 
-void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio * audio)
+void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 {
 	// nullptrチェック
 	assert(dxCommon);
@@ -32,7 +33,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio * audio)
 	// デバッグテキスト用テクスチャ読み込み
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
 		assert(0);
-		return ;
+		return;
 	}
 	// デバッグテキスト初期化
 	debugText = DebugText::GetInstance();
@@ -56,8 +57,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio * audio)
 	lightGroup = LightGroup::Create();
 
 	// カメラ注視点をセット
-	camera->SetTarget({0, 1, 0});
+	camera->SetTarget({ 0, 1, 0 });
 	camera->SetDistance(3.0f);
+
+	//モデル名を指定してファイル読み込み
+	FbxLoader::GetInstance()->LoadModelFromFile("cube");
+
 }
 
 void GameScene::Update()
