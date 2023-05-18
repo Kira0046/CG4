@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <DirectXMath.h>
+#include <DirectXTex.h>
 
 struct Node
 {
@@ -29,5 +30,28 @@ private:
 	std::string name;
 
 	std::vector<Node> nodes;
+
+public:
+	struct VertexPosNormalUv
+	{
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT2 uv;
+	};
+private:
+	//メッシュを持つノード
+	Node* meshNode = nullptr;
+	//頂点データ配列
+	std::vector<VertexPosNormalUv> vertices;
+	//頂点インデックス配列
+	std::vector<unsigned short> indices;
+	//アンビエント係数
+	DirectX::XMFLOAT3 ambient = { 1,1,1 };
+	//ディフューズ係数
+	DirectX::XMFLOAT3 diffuse = { 1,1,1 };
+	//テクスチャメタデータ
+	DirectX::TexMetadata metadata = {};
+	//スクラッチイメージ
+	DirectX::ScratchImage scratchImg = {};
 };
 

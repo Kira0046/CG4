@@ -48,6 +48,9 @@ private:
 	FbxImporter* fbxImporter = nullptr;
 
 	using string = std::string;
+
+	static const string defaultTextureFileName;
+
 public:
 	static const string baseDirectory;
 
@@ -63,4 +66,21 @@ public:
 	/// <param name="model"></param>
 	/// <param name="fbxNode"></param>
 	void ParseNodeRecursive(Model* model, FbxNode* fbxNode, Node* parent = nullptr);
+
+	/// <summary>
+	/// メッシュ読み取り
+	/// </summary>
+	/// <param name="model"></param>
+	/// <param name="fbxNode"></param>
+	void ParseMesh(Model* model, FbxNode* fbxNode);
+	//頂点座標読み取り
+	void ParseMeshVertices(Model* model, FbxMesh* fbxMesh);
+	//面積情報読み取り
+	void ParseMeshFaces(Model* model, FbxMesh* fbxMesh);
+	//マテリアル読み込み
+	void ParseMaterial(Model* model, FbxNode* fbxNode);
+	//テクスチャー読み取り
+	void LoadTexture(Model* model, const std::string& fullpath);
+	//ディレクトリを含んだファイルパスからファイル名を抽出する
+	std::string ExtracFileName(const std::string& path);
 };
