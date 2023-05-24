@@ -108,4 +108,14 @@ void Model::CreateBuffers(ID3D12Device* device)
 
 void Model::Draw(ID3D12GraphicsCommandList* cmdList)
 {
+	cmdList->IASetVertexBuffers(0, 1, &vbView);
+
+	cmdList->IASetIndexBuffer(&ibView);
+
+	ID3D12DescriptorHeap* ppHeap[] = { descHeapSRV.Get() };
+	cmdList->SetDescriptorHeaps(_countof(ppHeap), ppHeap);
+
+	cmdList->SetGraphicsRootDescriptorTable(1, descHeapSRV->GetGPUDescriptorHandleForHeapStart());
+
+	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
 }
