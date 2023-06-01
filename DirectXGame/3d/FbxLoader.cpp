@@ -18,6 +18,15 @@ FbxLoader* FbxLoader::GetInstance()
 	return &instance;
 }
 
+void FbxLoader::ConvertMatrixFromFbx(DirectX::XMMATRIX* dst, const FbxMatrix& src)
+{
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			dst->r[i].m128_f32[j] = (float)src.Get(i, j);
+		}
+	}
+}
+
 void FbxLoader::Initialize(ID3D12Device* device)
 {
 	//最初期化チェック
@@ -76,7 +85,8 @@ Model* FbxLoader::LoadModelFromFile(const string& modelName)
 	ParseNodeRecursive(model, fbxScene->GetRootNode());
 
 	//fbxシーン解放
-	fbxScene->Destroy();
+	//fbxScene->Destroy();
+	model->fbxScene = fbxScene;
 
 	//バッファ生成
 	model->CreateBuffers(device);
@@ -154,6 +164,8 @@ void FbxLoader::ParseMesh(Model* model, FbxNode* fbxNode)
 	ParseMeshFaces(model, fbxMesh);
 
 	ParseMaterial(model, fbxNode);
+
+	ParseSkin(model, fbxMesh);
 }
 
 void FbxLoader::ParseMeshVertices(Model* model, FbxMesh* fbxMesh)
@@ -164,7 +176,7 @@ void FbxLoader::ParseMeshVertices(Model* model, FbxMesh* fbxMesh)
 	const int controlPointCount = fbxMesh->GetControlPointsCount();
 
 	//必要数だけ頂点データ配列を確保
-	Model::VertexPosNormalUv vert{};
+	Model::VertexPosNormalUvSkin vert{};
 	model->vertices.resize(controlPointCount, vert);
 
 	//FBXメッシュの頂点座標配列を獲得
@@ -172,7 +184,7 @@ void FbxLoader::ParseMeshVertices(Model* model, FbxMesh* fbxMesh)
 
 	//FBXメッシュの全頂点座標をモデル内の配列にコピーする
 	for (int i = 0; i < controlPointCount; i++) {
-		Model::VertexPosNormalUv& vertex = vertices[i];
+		Model::VertexPosNormalUvSkin& vertex = vertices[i];
 
 		//座標のコピー
 		vertex.pos.x = (float)pCoord[i][0];
@@ -209,7 +221,7 @@ void FbxLoader::ParseMeshFaces(Model* model, FbxMesh* fbxMesh)
 			assert(index >= 0);
 
 			//頂点法線読み込み
-			Model::VertexPosNormalUv& vertex = vertices[index];
+			Model::VertexPosNormalUvSkin& vertex = vertices[index];
 			FbxVector4 normal;
 			if (fbxMesh->GetPolygonVertexNormal(i, j, normal)) {
 				vertex.normal.x = (float)normal[0];
@@ -325,4 +337,89 @@ std::string FbxLoader::ExtracFileName(const std::string& path)
 		return path.substr(pos1 + 1, path.size() - pos1 - 1);
 	}
 	return path;
+}
+
+void FbxLoader::ParseSkin(Model* model, FbxMesh* fbxMesh)
+{
+	FbxSkin* fbxSkin = static_cast<FbxSkin*>(fbxMesh->GetDeformer(0, FbxDeformer::eSkin));
+
+	if (fbxSkin == nullptr) {
+		return;
+	}
+
+	std::vector<Model::Bone>& bones = model->bones;
+
+	int clusterCount = fbxSkin->GetClusterCount();
+	bones.reserve(clusterCount);
+
+	for (int i = 0; i < clusterCount; i++) {
+		FbxCluster* fbxCluster = fbxSkin->GetCluster(i);
+
+		const char* boneName = fbxCluster->GetLink()->GetName();
+
+		bones.emplace_back(Model::Bone(boneName));
+		Model::Bone& bone = bones.back();
+
+		bone.fbxCluster = fbxCluster;
+
+		FbxAMatrix fbxMat;
+		fbxCluster->GetTransformLinkMatrix(fbxMat);
+
+		XMMATRIX initialPose;
+		ConvertMatrixFromFbx(&initialPose, fbxMat);
+
+		bone.intInitialPose = XMMatrixInverse(nullptr, initialPose);
+	}
+
+	struct WeightSet
+	{
+		UINT index;
+		float weight;
+	};
+
+	std::vector<std::list<WeightSet>> weightLists(model->vertices.size());
+
+	for (int i = 0; i < clusterCount; i++) {
+		FbxCluster* fbxCluster = fbxSkin->GetCluster(i);
+
+		int controlPointIndicesCount = fbxCluster->GetControlPointIndicesCount();
+
+		int* controlPointIndices = fbxCluster->GetControlPointIndices();
+		double* controlPointWeight = fbxCluster->GetControlPointWeights();
+
+		for (int j = 0; j < controlPointIndicesCount; j++) {
+			int vertIndex = controlPointIndices[j];
+
+			float weight = (float)controlPointWeight[j];
+
+			weightLists[vertIndex].emplace_back(WeightSet{ (UINT)i,weight });
+		}
+	}
+
+	auto& vertices = model->vertices;
+
+	for (int i = 0; i < vertices.size(); i++) {
+		auto& weightList = weightLists[i];
+
+		weightList.sort(
+			[](auto const& lhs, auto const& rhs) {
+				return lhs.weight > rhs.weight;
+			});
+
+		int weightArrayIndex = 0;
+
+		for (auto& WeightSet : weightList) {
+			vertices[i].boneIndex[weightArrayIndex] = WeightSet.index;
+			vertices[i].boneWeight[weightArrayIndex] = WeightSet.weight;
+			if (++weightArrayIndex >= Model::MAX_BONE_INDICES) {
+				float weight = 0.0f;
+
+				for (int j = 1; j < Model::MAX_BONE_INDICES; j++) {
+					weight += vertices[i].boneWeight[j];
+				}
+				vertices[i].boneWeight[0] = 1.0f - weight;
+				break;
+			}
+		}
+	}
 }

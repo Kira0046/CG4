@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <d3dx12.h>
+#include <fbxsdk.h>
 
 struct Node
 {
@@ -28,6 +29,8 @@ struct Node
 
 class Model
 {
+public:
+	~Model();
 private: //エイリアス
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -44,25 +47,47 @@ private: //エイリアス
 public:
 	friend class FbxLoader;
 
+	static const int MAX_BONE_INDICES = 4;
+
 private:
 	std::string name;
 
 	std::vector<Node> nodes;
 
 public:
-	struct VertexPosNormalUv
+	struct VertexPosNormalUvSkin
 	{
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT2 uv;
+		UINT boneIndex[MAX_BONE_INDICES];
+		float boneWeight[MAX_BONE_INDICES];
+	};
+
+	//ボーン構造体
+	struct  Bone
+	{
+		std::string name;
+
+		DirectX::XMMATRIX intInitialPose;
+
+		FbxCluster* fbxCluster;
+
+		Bone(const std::string& name) {
+			this->name = name;
+		}
 	};
 private:
 	//メッシュを持つノード
 	Node* meshNode = nullptr;
+	//FBXシーン
+	FbxScene* fbxScene = nullptr;
 	//頂点データ配列
-	std::vector<VertexPosNormalUv> vertices;
+	std::vector<VertexPosNormalUvSkin> vertices;
 	//頂点インデックス配列
 	std::vector<unsigned short> indices;
+	//ボーン配列
+	std::vector<Bone> bones;
 	//アンビエント係数
 	XMFLOAT3 ambient = { 1,1,1 };
 	//ディフューズ係数
@@ -95,5 +120,9 @@ public:
 	void Draw(ID3D12GraphicsCommandList* cmdList);
 	//モデルの変形行列取得
 	const XMMATRIX& GetModelTransform() { return meshNode->globalTransform; }
+	//getter
+	std::vector<Bone>& GetBones() { return bones; }
+
+	FbxScene* GetFbxScene() { return fbxScene; }
 };
 
