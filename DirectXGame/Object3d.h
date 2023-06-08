@@ -25,6 +25,8 @@ public: //静的メンバ関数
 	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
 
 	static void CreateGraphicsPipeline();
+	//ボーンの最大数
+	static const int MAX_BONE = 32;
 
 private: //静的メンバ変数
 	//デバイス
@@ -41,6 +43,11 @@ public:
 		XMMATRIX viewproj;
 		XMMATRIX world;
 		XMFLOAT3 cameraPos;
+	};
+
+	struct ConstBufferDataSkin
+	{
+		XMMATRIX bones[MAX_BONE];
 	};
 public:
 	/// <summary>
@@ -67,6 +74,8 @@ public:
 protected:
 	//定理バッファ
 	Comptr<ID3D12Resource> constBuffTransform;
+	//定数バッファ(スキン)
+	Comptr<ID3D12Resource> constBuffSkin;
 	//ローカルスケール
 	XMFLOAT3 scale = { 1,1,1 };
 	//ローカル回転角
