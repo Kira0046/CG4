@@ -10,28 +10,28 @@ SkinOutput ComputeSkin(VSInput input)
     
     //ボーン0
     iBone = input.boneIndices.x;
-    weight = input.boneWeight.x;
+    weight = input.boneWeights.x;
     m = matSkinning[iBone];
     output.pos += weight * mul(m, input.pos);
     output.normal += weight * mul((float3x3) m, input.normal);
     
     //ボーン1
     iBone = input.boneIndices.y;
-    weight = input.boneWeight.y;
+    weight = input.boneWeights.y;
     m = matSkinning[iBone];
     output.pos += weight * mul(m, input.pos);
     output.normal += weight * mul((float3x3) m, input.normal);
     
     //ボーン2
     iBone = input.boneIndices.z;
-    weight = input.boneWeight.z;
+    weight = input.boneWeights.z;
     m = matSkinning[iBone];
     output.pos += weight * (m, input.pos);
     output.normal += weight * mul((float3x3) m, input.normal);
     
     //ボーン3
     iBone = input.boneIndices.w;
-    weight = input.boneWeight.w;
+    weight = input.boneWeights.w;
     m = matSkinning[iBone];
     output.pos += weight * mul(m, input.pos);
     output.normal += weight * mul((float3x3) m, input.normal);

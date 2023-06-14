@@ -19,7 +19,7 @@ struct VSInput
     float3 normal : NORMAL;
     float2 uv : TEXCOORD;
     uint4 boneIndices : BONEINDICES;
-    float4 boneWeight : BONEWEIGHT;
+    float4 boneWeights : BONEWEIGHTS;
 };
 
 struct VSOutput
