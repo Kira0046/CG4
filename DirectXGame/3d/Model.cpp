@@ -57,7 +57,7 @@ void Model::CreateBuffers(ID3D12Device* device)
 	}
 	//インデックスバッファビューの作成
 	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R16G16B16A16_UINT;
+	ibView.Format = DXGI_FORMAT_R16_UINT;
 	ibView.SizeInBytes = sizeIB;
 
 	//テクスチャ画像データ
@@ -103,7 +103,7 @@ void Model::CreateBuffers(ID3D12Device* device)
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	D3D12_RESOURCE_DESC resDesc = texBuff->GetDesc();
 
-	srvDesc.Format = resourceDesc.Format;
+	srvDesc.Format = resDesc.Format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;

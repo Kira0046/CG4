@@ -26,7 +26,7 @@ SkinOutput ComputeSkin(VSInput input)
     iBone = input.boneIndices.z;
     weight = input.boneWeight.z;
     m = matSkinning[iBone];
-    output.pos += weight * (m, input.pos);
+    output.pos += weight * mul(m, input.pos);
     output.normal += weight * mul((float3x3) m, input.normal);
     
     //É{Å[Éì3
