@@ -64,13 +64,13 @@ private:
 	//頂点インデックス配列
 	std::vector<unsigned short> indices;
 	//アンビエント係数
-	XMFLOAT3 ambient = { 1,1,1 };
+	DirectX::XMFLOAT3 ambient = { 1,1,1 };
 	//ディフューズ係数
-	XMFLOAT3 diffuse = { 1,1,1 };
+	DirectX::XMFLOAT3 diffuse = { 1,1,1 };
 	//テクスチャメタデータ
-	TexMetadata metadata = {};
+	DirectX::TexMetadata metadata = {};
 	//スクラッチイメージ
-	ScratchImage scratchImg = {};
+	DirectX::ScratchImage scratchImg = {};
 
 
 
@@ -80,7 +80,7 @@ private:
 	//インデックスバッファ
 	ComPtr<ID3D12Resource> indexBuff;
 	//テクスチャバッファ
-	ComPtr<ID3D12Resource> texBuff;
+	ComPtr<ID3D12Resource> texbuff;
 	//頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vbView = {};
 	//インデックスバッファビュー

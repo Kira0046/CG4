@@ -49,10 +49,12 @@ private:
 
 	using string = std::string;
 
-	static const string defaultTextureFileName;
+
 
 public:
 	static const string baseDirectory;
+
+	static const string defaultTextureFileName;
 
 	/// <summary>
 	/// ファイルからFBXモデル読み込み
@@ -73,6 +75,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="fbxNode"></param>
 	void ParseMesh(Model* model, FbxNode* fbxNode);
+
 	//頂点座標読み取り
 	void ParseMeshVertices(Model* model, FbxMesh* fbxMesh);
 	//面積情報読み取り

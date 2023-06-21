@@ -87,6 +87,7 @@ Model* FbxLoader::LoadModelFromFile(const string& modelName)
 
 void FbxLoader::ParseNodeRecursive(Model* model, FbxNode* fbxNode, Node* parent)
 {
+	string name = fbxNode->GetName();
 	//モデルにノードを追加
 	model->nodes.emplace_back();
 	Node& node = model->nodes.back();
@@ -161,17 +162,17 @@ void FbxLoader::ParseMeshVertices(Model* model, FbxMesh* fbxMesh)
 	auto& vertices = model->vertices;
 
 	//頂点座標データの数
-	const int controlPointCount = fbxMesh->GetControlPointsCount();
+	const int controlPointsCount = fbxMesh->GetControlPointsCount();
 
 	//必要数だけ頂点データ配列を確保
 	Model::VertexPosNormalUv vert{};
-	model->vertices.resize(controlPointCount, vert);
+	model->vertices.resize(controlPointsCount, vert);
 
 	//FBXメッシュの頂点座標配列を獲得
 	FbxVector4* pCoord = fbxMesh->GetControlPoints();
 
 	//FBXメッシュの全頂点座標をモデル内の配列にコピーする
-	for (int i = 0; i < controlPointCount; i++) {
+	for (int i = 0; i < controlPointsCount; i++) {
 		Model::VertexPosNormalUv& vertex = vertices[i];
 
 		//座標のコピー
