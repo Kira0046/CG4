@@ -7,7 +7,6 @@ cbuffer cbuff0 : register(b0)
 
 struct VSInput
 {
-
     float4 pos : POSITION;
     float3 normal : NORMAL;
     float2 uv : TEXCOORD;

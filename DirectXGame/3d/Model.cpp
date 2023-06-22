@@ -104,6 +104,7 @@ void Model::CreateBuffers(ID3D12Device* device)
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	descHeapDesc.NumDescriptors = 1;
 	result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeapSRV));
+	assert(SUCCEEDED(result));
 
 	//シェーダーリソースビュー作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -123,8 +124,8 @@ void Model::Draw(ID3D12GraphicsCommandList* cmdList)
 
 	cmdList->IASetIndexBuffer(&ibView);
 
-	ID3D12DescriptorHeap* ppHeap[] = { descHeapSRV.Get() };
-	cmdList->SetDescriptorHeaps(_countof(ppHeap), ppHeap);
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeapSRV.Get() };
+	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	cmdList->SetGraphicsRootDescriptorTable(1, descHeapSRV->GetGPUDescriptorHandleForHeapStart());
 

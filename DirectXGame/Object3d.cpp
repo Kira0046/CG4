@@ -174,6 +174,7 @@ void Object3d::Initialize()
 		nullptr,
 		IID_PPV_ARGS(&constBuffTransform)
 	);
+	assert(SUCCEEDED(result));
 }
 
 void Object3d::Update()
@@ -183,9 +184,9 @@ void Object3d::Update()
 	//スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
-	matRot = XMMatrixRotationZ(XMConvertToRadians(rotation.z));
-	matRot = XMMatrixRotationX(XMConvertToRadians(rotation.x));
-	matRot = XMMatrixRotationY(XMConvertToRadians(rotation.y));
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
 	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	//ワールド座標の合成
@@ -212,6 +213,7 @@ void Object3d::Update()
 		constMap->cameraPos = cameraPos;
 		constBuffTransform->Unmap(0, nullptr);
 	}
+	assert(SUCCEEDED(result));
 }
 
 void Object3d::Draw(ID3D12GraphicsCommandList* cmdList)
