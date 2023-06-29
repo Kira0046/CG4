@@ -69,6 +69,11 @@ public:
 	/// </summary>
 	/// <param name="cmdList"></param>
 	void Draw(ID3D12GraphicsCommandList* cmdList);
+
+	/// <summary>
+	/// アニメーション再生
+	/// </summary>
+	void PlayAnimation();
 protected:
 	//定数バッファ
 	Comptr<ID3D12Resource> constBuffTransform;
@@ -84,4 +89,14 @@ protected:
 	XMMATRIX matWorld;
 	//モデル
 	Model* model = nullptr;
+private:
+	FbxTime frameTime;
+
+	FbxTime startTime;
+
+	FbxTime endTime;
+
+	FbxTime currentTime;
+
+	bool isPlay = false;
 };
