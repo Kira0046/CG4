@@ -44,7 +44,7 @@ public:
 private://Ã“Iƒƒ“ƒo•Ï”
 	static const float clearColor[4];
 private:
-	Microsoft::WRL::ComPtr<ID3D12Resource> texBuff;
+	Microsoft::WRL::ComPtr<ID3D12Resource> texBuff[2];
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descHeapSRV;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthBuff;
